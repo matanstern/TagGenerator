@@ -1,0 +1,181 @@
+<!doctype html>
+<html>
+<head>
+	<title>Server API Checklist</title>
+	<style>
+		div.hidden
+		{
+		   display: none
+		}
+
+		.button {
+			background-color: white;
+    		color: black;
+    		border: 2px solid #4CAF50; /* Green */
+		    padding: 15px 32px;
+		    text-align: center;
+		    text-decoration: none;
+		    display: inline-block;
+		    font-size: 16px;
+		}
+
+		.button:hover {
+		    background-color: #4CAF50; /* Green */
+		    color: white;
+		}
+	</style>
+</head>
+<body>
+<h1>Server API Checklist</h1>
+
+<!-- App ID -->
+<form>
+<strong>App ID: </strong><input type="text" id="appid"><br>
+</form>
+
+<!-- Response Types -->
+<h2>Response Type</h2>
+<select id="servletSelect">
+  <option value="requestEnhancedXmlAd?">XML</option>
+  <option value="clientRequestEnhancedXmlAd?">XML Client</option>
+  <option value="requestEnhancedHtmlAd?">HTML</option>
+  <option value="clientRequestEnhancedHtmlAd?">HTML Client</option>
+  <option value="vastTag?">VAST</option>
+  <option value="requestNativeAd?">Native</option>
+</select>
+
+
+<!---->
+<h2>Parameters to use</h2>
+<ul name="paramList">
+<li><input type="checkbox" name="param" color="red" value="&ua={USER_AGENT}" checked/><label>User Agent (Mandatory!)</label></li>
+<li><input type="checkbox" name="param" color="red" value="&cip={CLIENT_IP}" value="a" checked/><label>Client IP (Mandatory!)</label></li>
+<li>
+	<form>
+	<strong>Features Supported: </strong><select id="featureSelect">
+	  <option value="&f=20">Simple HTML</option>
+	  <option value="&f=84">HTML + MRIAD</option>
+	  <option value="">VAST</option>
+	</select>
+	</form>
+</li>
+<li>
+	<label><strong>Recommended Parameters:</strong></label>
+	<div id="recommendedParams">
+		<ul>
+			<li><input type="checkbox" name="param" value="&lg={GPS_LOCATION}"/><label>GPS Location</label></li>
+			<li><input type="checkbox" name="param" value="&idfa={ADVERTISER_ID_IOS}"/><label>Apple IFA</label></li>
+			<li><input type="checkbox" name="param" value="&aaid={ADVERTISER_ID_ANDROID}"/><label>Android Advertiser ID</label></li>
+			<li><input type="checkbox" name="param" value="&bid={BUNDLE_ID}"/><label>Bundle ID</label></li>
+			<li><input type="checkbox" name="param" value="&appName={APP_NAME}"/><label>App Name (Mainly For Aggregators)</label></li>
+		</ul>
+	</div>
+</li>
+<li>
+	<label><strong>Demographic Parameters:</strong></label>
+	<div id="demographicParams">
+		<ul>
+			<li><input type="checkbox" name="param" value="&a={USER_AGE}"/><label>Age</label></li>
+			<li><input type="checkbox" name="param" value="&g={USER_GENDER}"/><label>Gender</label></li>
+			<li><input type="checkbox" name="param" value="&k={KEYWORDS}"/><label>Keywords</label></li>
+		</ul>
+	</div>
+</li>
+<li>
+	<label><strong>Optional Parameters:</strong></label>
+	<div id="optionalParams">
+		<ul>
+			<li><input type="checkbox" name="param" value="&fs=true"/><label>Full Screen</label></li>
+			<li><input type="checkbox" name="param" color="red" value="&rw=300&rh=250"/><label>Rectangle Ads Only</label></li>
+			<li><input type="checkbox" name="param" value="&amd={ANDROID_ID_ENCODED_MD5}"/><label>Android ID MD5</label></li>
+			<li><input type="checkbox" name="param" value="&asha={ANDROID_ID_ENCODED_SHA1}"/><label>Android ID SHA1</label></li>
+			<li><input type="checkbox" name="param" value="&lng={DEVICE_LANGUAGE}"/><label>Device Language</label></li>
+			<li><input type="checkbox" name="param" value="&l={LOCATION_STRING}"/><label>Location String</label></li>
+		</ul>
+	</div>
+</li>
+
+</ul>
+
+<button type="button" class="button" name="RequestGenerator" onclick="generateTag()">Generate Tag</button>
+
+<p id="tag"></p>
+
+<script type="text/javascript">
+	function generateTag() {
+		var checkedBoxes = getCheckedBoxes("param");
+		var text = CreateBaseURI();
+
+		for (var i=0; i<checkedBoxes.length; i++) {
+	     text = text.concat(checkedBoxes[i].value);
+	  }
+
+	  document.getElementById("tag").innerHTML = text;
+	}
+
+
+	function getCheckedBoxes(chkboxName) {
+	  var checkboxes = document.getElementsByName(chkboxName);
+	  var checkboxesChecked = [];
+	  // loop over them all
+	  for (var i=0; i<checkboxes.length; i++) {
+	     // And stick the checked ones onto an array...
+	     if (checkboxes[i].checked) {
+	        checkboxesChecked.push(checkboxes[i]);
+	     }
+	  }
+	  // Return the array if it is non-empty, or null
+	  return checkboxesChecked.length > 0 ? checkboxesChecked : null;
+	}
+
+	// Create requests base URI
+	function CreateBaseURI() {
+		var base = "http://m2m1.inner-active.mobi/simpleM2M/";
+
+		//concate servlet
+		base = base.concat(document.getElementById("servletSelect").value);
+
+		//concate AppID
+		var app = "aid=".concat(document.getElementById("appid").value);
+		base = base.concat(app);
+
+		//concate server version
+		base = base.concat("&v=Sm2m-2.1.0");
+
+		//concate features
+		base = base.concat(document.getElementById("featureSelect").value)
+
+		return base;
+	}
+
+
+	function handleRecommendedClick(check) {
+		if (check.checked){
+			document.getElementById("recommendedParams").style.visibility = "visible";
+		}
+		else {
+			document.getElementById("recommendedParams").style.visibility = "hidden";
+		}
+	}
+
+	function handleDemographicClick(check) {
+		if (check.checked){
+			document.getElementById("demographicParams").style.visibility = "visible";
+		}
+		else {
+			document.getElementById("demographicParams").style.visibility = "hidden";
+		}
+	}
+
+	function handleOptionalClick(check) {
+		if (check.checked){
+			document.getElementById("optionalParams").style.visibility = "visible";
+		}
+		else {
+			document.getElementById("optionalParams").style.visibility = "hidden";
+		}
+	}
+</script>
+
+</body>
+</html>
