@@ -1,139 +1,156 @@
 <!doctype html>
 <html>
 <head>
-	<title>Server API Checklist</title>
-	<style>
-		div.hidden
-		{
-		   display: none
-		}
+	<style type="text/css">
+		div.hidden { display: none; }
+		h2.hidden { display: none; }
+		option.hidden { display: none; }
+		li.hidden { display: none; }
 
 		.button {
-			background-color: white;
-    		color: black;
-    		border: 2px solid #4CAF50; /* Green */
-		    padding: 15px 32px;
+		    background-color: #4CAF50; /* Green */
+		    border: none;
+		    color: white;
+		    padding: 16px 32px;
 		    text-align: center;
 		    text-decoration: none;
 		    display: inline-block;
 		    font-size: 16px;
+		    margin: 4px 2px;
+		    -webkit-transition-duration: 0.4s; /* Safari */
+		    transition-duration: 0.4s;
+		    cursor: pointer;
 		}
 
-		.button:hover {
-		    background-color: #4CAF50; /* Green */
+		.button1 {
+		    background-color: white;
+		    color: black;
+		    border: 2px solid #008CBA;
+		}
+
+		.button1:hover {
+		    background-color: #008CBA;
 		    color: white;
 		}
+
+		/* Outer */
+		.popup {
+		    width:100%;
+		    height:100%;
+		    display:none;
+		    position:fixed;
+		    top:0px;
+		    left:0px;
+		    background:rgba(0,0,0,0.75);
+		}
+		 
+		/* Inner */
+		.popup-inner {
+		    max-width:700px;
+		    width:90%;
+		    padding:40px;
+		    position:absolute;
+		    top:50%;
+		    left:50%;
+		    -webkit-transform:translate(-50%, -50%);
+		    transform:translate(-50%, -50%);
+		    box-shadow:0px 2px 6px rgba(0,0,0,1);
+		    border-radius:3px;
+		    background:#fff;
+		}
+		 
+		/* Close Button */
+		.popup-close {
+		    width:30px;
+		    height:30px;
+		    padding-top:4px;
+		    display:inline-block;
+		    position:absolute;
+		    top:0px;
+		    right:0px;
+		    transition:ease 0.25s all;
+		    -webkit-transform:translate(50%, -50%);
+		    transform:translate(50%, -50%);
+		    border-radius:1000px;
+		    background:rgba(0,0,0,0.8);
+		    font-family:Arial, Sans-Serif;
+		    font-size:20px;
+		    text-align:center;
+		    line-height:100%;
+		    color:#fff;
+		}
+		 
+		.popup-close:hover {
+		    -webkit-transform:translate(50%, -50%) rotate(180deg);
+		    transform:translate(50%, -50%) rotate(180deg);
+		    background:rgba(0,0,0,1);
+		    text-decoration:none;
+		}
 	</style>
-</head>
-<body>
-<h1>Server API Checklist</h1>
+	
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+	<script type="text/javascript">
 
-<!-- App ID -->
-<form>
-<strong>App ID: </strong><input type="text" id="appid"><br>
-</form>
+	// JQuery for popup
+	$(function() {
+	    //----- OPEN
+	    $('[data-popup-open]').on('click', function(e)  {
+	        var targeted_popup_class = jQuery(this).attr('data-popup-open');
+	        $('[data-popup="' + targeted_popup_class + '"]').fadeIn(350);
+	 
+	        e.preventDefault();
+	    });
+	 
+	    //----- CLOSE
+	    $('[data-popup-close]').on('click', function(e)  {
+	        var targeted_popup_class = jQuery(this).attr('data-popup-close');
+	        $('[data-popup="' + targeted_popup_class + '"]').fadeOut(350);
+	 
+	        e.preventDefault();
+	    });
+	});
 
-<!-- Response Types -->
-<h2>Response Type</h2>
-<select id="servletSelect">
-  <option value="requestEnhancedXmlAd?">XML</option>
-  <option value="clientRequestEnhancedXmlAd?">XML Client</option>
-  <option value="requestEnhancedHtmlAd?">HTML</option>
-  <option value="clientRequestEnhancedHtmlAd?">HTML Client</option>
-  <option value="vastTag?">VAST</option>
-  <option value="requestNativeAd?">Native</option>
-</select>
 
-
-<!---->
-<h2>Parameters to use</h2>
-<ul name="paramList">
-<li><input type="checkbox" name="param" color="red" value="&ua={USER_AGENT}" checked/><label>User Agent (Mandatory!)</label></li>
-<li><input type="checkbox" name="param" color="red" value="&cip={CLIENT_IP}" value="a" checked/><label>Client IP (Mandatory!)</label></li>
-<li>
-	<form>
-	<strong>Features Supported: </strong><select id="featureSelect">
-	  <option value="&f=20">Simple HTML</option>
-	  <option value="&f=84">HTML + MRIAD</option>
-	  <option value="">VAST</option>
-	</select>
-	</form>
-</li>
-<li>
-	<label><strong>Recommended Parameters:</strong></label>
-	<div id="recommendedParams">
-		<ul>
-			<li><input type="checkbox" name="param" value="&lg={GPS_LOCATION}"/><label>GPS Location</label></li>
-			<li><input type="checkbox" name="param" value="&idfa={ADVERTISER_ID_IOS}"/><label>Apple IFA</label></li>
-			<li><input type="checkbox" name="param" value="&aaid={ADVERTISER_ID_ANDROID}"/><label>Android Advertiser ID</label></li>
-			<li><input type="checkbox" name="param" value="&bid={BUNDLE_ID}"/><label>Bundle ID</label></li>
-			<li><input type="checkbox" name="param" value="&appName={APP_NAME}"/><label>App Name (Mainly For Aggregators)</label></li>
-		</ul>
-	</div>
-</li>
-<li>
-	<label><strong>Demographic Parameters:</strong></label>
-	<div id="demographicParams">
-		<ul>
-			<li><input type="checkbox" name="param" value="&a={USER_AGE}"/><label>Age</label></li>
-			<li><input type="checkbox" name="param" value="&g={USER_GENDER}"/><label>Gender</label></li>
-			<li><input type="checkbox" name="param" value="&k={KEYWORDS}"/><label>Keywords</label></li>
-		</ul>
-	</div>
-</li>
-<li>
-	<label><strong>Optional Parameters:</strong></label>
-	<div id="optionalParams">
-		<ul>
-			<li><input type="checkbox" name="param" value="&fs=true"/><label>Full Screen</label></li>
-			<li><input type="checkbox" name="param" color="red" value="&rw=300&rh=250"/><label>Rectangle Ads Only</label></li>
-			<li><input type="checkbox" name="param" value="&amd={ANDROID_ID_ENCODED_MD5}"/><label>Android ID MD5</label></li>
-			<li><input type="checkbox" name="param" value="&asha={ANDROID_ID_ENCODED_SHA1}"/><label>Android ID SHA1</label></li>
-			<li><input type="checkbox" name="param" value="&lng={DEVICE_LANGUAGE}"/><label>Device Language</label></li>
-			<li><input type="checkbox" name="param" value="&l={LOCATION_STRING}"/><label>Location String</label></li>
-		</ul>
-	</div>
-</li>
-
-</ul>
-
-<button type="button" class="button" name="RequestGenerator" onclick="generateTag()">Generate Tag</button>
-
-<p id="tag"></p>
-
-<script type="text/javascript">
 	function generateTag() {
-		var checkedBoxes = getCheckedBoxes("param");
+		var queryParams = getQueryParams("param");
 		var text = CreateBaseURI();
 
-		for (var i=0; i<checkedBoxes.length; i++) {
-	     text = text.concat(checkedBoxes[i].value);
-	  }
+		if (queryParams != null){
+			for (var i=0; i<queryParams.length; i++) {
+	    		text = text.concat(queryParams[i].value);
+			}
+		}
 
-	  document.getElementById("tag").innerHTML = text;
+		document.getElementById("tag").innerHTML = text;
 	}
 
 
-	function getCheckedBoxes(chkboxName) {
-	  var checkboxes = document.getElementsByName(chkboxName);
-	  var checkboxesChecked = [];
-	  // loop over them all
-	  for (var i=0; i<checkboxes.length; i++) {
-	     // And stick the checked ones onto an array...
-	     if (checkboxes[i].checked) {
-	        checkboxesChecked.push(checkboxes[i]);
-	     }
+	function getQueryParams(paramName) {
+	  var queryParams = document.getElementsByName(paramName);
+
+	  if (queryParams != null){
+	  	var queryParamsChecked = [];
+		  // loop over them all
+		  for (var i=0; i<queryParams.length; i++) {
+		     // And stick the checked ones onto an array...
+		     if (queryParams[i].checked && queryParams[i].disabled == false) {
+		        queryParamsChecked.push(queryParams[i]);
+		     }
+		  }
+		  // Return the array if it is non-empty, or null
+		  return queryParamsChecked.length > 0 ? queryParamsChecked : null;
 	  }
-	  // Return the array if it is non-empty, or null
-	  return checkboxesChecked.length > 0 ? checkboxesChecked : null;
+	  
 	}
+
 
 	// Create requests base URI
 	function CreateBaseURI() {
 		var base = "http://m2m1.inner-active.mobi/simpleM2M/";
 
 		//concate servlet
-		base = base.concat(document.getElementById("servletSelect").value);
+		base = base.concat(document.getElementById("serverServletSelect").value);
 
 		//concate AppID
 		var app = "aid=".concat(document.getElementById("appid").value);
@@ -149,33 +166,194 @@
 	}
 
 
-	function handleRecommendedClick(check) {
-		if (check.checked){
-			document.getElementById("recommendedParams").style.visibility = "visible";
-		}
-		else {
-			document.getElementById("recommendedParams").style.visibility = "hidden";
-		}
+	// Toggles Visibility for Client/Server dropdown pick
+	function toggle_visibility(text) {
+
+	   // Hide the defualt option
+	   document.getElementById("clientSelect").options[0].className = "hidden";
+
+	   if (text == "Client")
+	   {
+	   		document.getElementById("ua").checked = false;
+	   		document.getElementById("ua").disabled = true;
+	   		document.getElementById("cip").checked = false;
+	   		document.getElementById("cip").disabled = true;
+	   }
+	   else if (text == "Server")
+	   {
+	   		document.getElementById("ua").checked = true;
+	   		document.getElementById("ua").disabled = false;
+	   		document.getElementById("cip").checked = true;
+	   		document.getElementById("cip").disabled = false;
+	   }
+
+	   var servletList = document.getElementById("serverServletSelect").options;
+	   
+	   for (var i=0; i<servletList.length; i++) {
+         if (servletList[i].id == text || servletList[i].id == "VAST" || servletList[i].id == "Native"){
+         	servletList[i].className = "";
+         }
+         else{
+         	if (servletList[i].className == "")
+         	{
+         		servletList[i].className = "hidden"
+         	}
+         }
+	   } 
 	}
 
-	function handleDemographicClick(check) {
-		if (check.checked){
-			document.getElementById("demographicParams").style.visibility = "visible";
-		}
-		else {
-			document.getElementById("demographicParams").style.visibility = "hidden";
-		}
+
+	// Shows Parameters Div after choosing Response Type
+	function showParamsDiv() {
+		document.getElementById("paramsDiv").className = "";
+
+		var e = document.getElementById("serverServletSelect");
+		var selectedID = e.options[e.selectedIndex].id
+
+		// If VAST was selected disable and hide the features list
+	    if (selectedID == "VAST"){
+         	if (document.getElementById("featuresListItem").className == ""){
+         		document.getElementById("featuresListItem").className = "hidden";
+         		document.getElementById("featuresListItem").disabled = true;
+         	}
+        }
+        else{
+        	// Else, show it
+        	if (document.getElementById("featuresListItem").className == "hidden"){
+         		document.getElementById("featuresListItem").className = "";
+         		document.getElementById("featuresListItem").disabled = false;
+         	}
+        }
 	}
 
-	function handleOptionalClick(check) {
-		if (check.checked){
-			document.getElementById("optionalParams").style.visibility = "visible";
-		}
-		else {
-			document.getElementById("optionalParams").style.visibility = "hidden";
-		}
+	// AdvertiserID Toggle on and off
+	function toggleAdvertiserID(){
+		document.getElementById("idfa").disabled ^= true;
+		document.getElementById("idfa").checked = false;
+		document.getElementById("aaid").disabled ^= true;
+		document.getElementById("aaid").checked = false;
 	}
+
 </script>
+</head>
+<body>
+	
+<h1>Server API Checklist</h1>
+
+
+<!-- App ID -->
+<form>
+<strong>App ID: </strong><input type="text" id="appid"><br>
+</form>
+
+<!-- Client Type -->
+<h2>Client Type</h2>
+<select id="clientSelect" onchange="if (this.selectedIndex > 0) toggle_visibility(this.options[this.selectedIndex].text);">
+  <option value="-1">-----</option>
+  <option>Client</option>
+  <option>Server</option>
+</select>
+
+<!-- Response Types -->
+<h2>Response Type</h2>
+<select id="serverServletSelect" onchange="showParamsDiv();">
+  <option value="-1">-----</option>
+  <option value="requestEnhancedXmlAd?" class="hidden" id="Server">XML</option>
+  <option value="clientRequestEnhancedXmlAd?" class="hidden" id="Client">XML Client</option>
+  <option value="requestEnhancedHtmlAd?" class="hidden" id="Server">HTML</option>
+  <option value="clientRequestEnhancedHtmlAd?" class="hidden" id="Client">HTML Client</option>
+  <option value="vastTag?" class="hidden" id="VAST">VAST</option>
+  <option value="requestNativeAd?" class="hidden" id="Native">Native</option>
+</select>
+
+
+<div id="paramsDiv" class="hidden">
+	<!-- Parameters -->
+	<h2>Parameters to use</h2>
+	<ul name="paramList">
+	<li class="hidden"><input type="checkbox" id="ua" name="param" value="&ua={USER_AGENT}"/><label>User Agent</label></li>
+	<li class="hidden"><input type="checkbox" id="cip" name="param" value="&cip={CLIENT_IP}"/><label>Client IP</label></li>
+	<li id="featuresListItem">
+		<form id="featuresSelect">
+		<strong>Features Supported: </strong>
+		<select id="featureSelect">
+		  <option value="&f=20">Banner - Simple HTML</option>
+		  <option value="&f=84">Banner - HTML + MRIAD</option>
+		  <option value="&f=20&rw=300&rh=250">Rectangle - Simple HTML</option>
+		  <option value="&f=84&rw=300&rh=250">Rectangle - HTML + MRIAD</option>
+		  <option value="&f=372&fs=true">Interstitial</option>
+		</select>
+		</form>
+	</li>
+	<li>
+		<label><strong>Recommended Parameters:</strong></label>
+		<div id="recommendedParams">
+			<ul>
+				<li><input type="checkbox" name="param" value="&lg={GPS_LOCATION}"/><label>GPS Location</label></li>
+				<li>
+					<form>
+						<input type="checkbox" onchange="toggleAdvertiserID();"/><label>Advertiser ID</label>
+						<input id="idfa" type="radio" name="param" value="&idfa={ADVERTISER_ID_IOS}" disabled/><label>Apple IFA</label>
+						<input id="aaid" type="radio" name="param" value="&aaid={ADVERTISER_ID_ANDROID}" disabled/><label>Android Advertiser ID</label>
+					</form>
+				</li>
+				<li><input type="checkbox" name="param" value="&bid={BUNDLE_ID}"/><label>Bundle ID</label></li>
+				<li><input type="checkbox" name="param" value="&appName={APP_NAME}"/><label>App Name</label></li>
+			</ul>
+		</div>
+	</li>
+	<li>
+		<label><strong>Demographic Parameters:</strong></label>
+		<div id="demographicParams">
+			<ul>
+				<li><input type="checkbox" name="param" value="&a={USER_AGE}"/><label>User Age</label></li>
+				<li><input type="checkbox" name="param" value="&g={USER_GENDER}"/><label>User Gender</label></li>
+				<li><input type="checkbox" name="param" value="&k={KEYWORDS}"/><label>Keywords</label></li>
+			</ul>
+		</div>
+	</li>
+	<li>
+		<label><strong>Optional Parameters:</strong></label>
+		<div id="optionalParams">
+			<ul>
+				<li><input type="checkbox" name="param" value="&amd={ANDROID_ID_ENCODED_MD5}"/><label>Android ID MD5 Hashing</label></li>
+				<li><input type="checkbox" name="param" value="&asha={ANDROID_ID_ENCODED_SHA1}"/><label>Android ID SHA1 Hashing</label></li>
+				<li><input type="checkbox" name="param" value="&lng={DEVICE_LANGUAGE}"/><label>Device Language</label></li>
+				<li><input type="checkbox" name="param" value="&w={SCREEN_WIDTH}"/><label>Screen Width (In Pixels)</label></li>
+				<li><input type="checkbox" name="param" value="&h={SCREEN_HEIGHT}"/><label>Screen Height (In Pixels)</label></li>
+				<li><input type="checkbox" name="param" value="&dynamicfp={DYNAMIC_FLOOR_PRICE}"/><label>Dynamic Floor Price</label></li>
+				<li><input type="checkbox" name="param" value="&mnc={MNC}"/><label>MNC (Mobile Network Code)</label></li>
+				<li><input type="checkbox" name="param" value="&mcc={MCC}"/><label>MCC (Mobile Country Code)</label></li>
+				<li><input type="checkbox" name="param" value="&nt={NETWORK_CONNECTION_TYPE}"/><label>Network Connection Type (3G/4G/Wifi)</label></li>
+				<li><input type="checkbox" name="param" value="&refurl={REFERRAL_URL}"/><label>Referral URL</label></li>
+				<li><input type="checkbox" name="param" value="&secure=1"/><label>Is Secured</label></li>
+			</ul>
+		</div>
+	</li>
+	<li id="native" class="hidden">
+		<form>
+			<strong>Native Assets:</strong>
+			<ul>
+				<li><input type="checkbox" name="param" value="&lg={GPS_LOCATION}"/><label>Title</label></li>
+				<li><input type="checkbox" name="param" value="&lg={GPS_LOCATION}"/><label>Description</label></li>
+				<li><input type="checkbox" name="param" value="&lg={GPS_LOCATION}"/><label>Main</label></li>
+				<li><input type="checkbox" name="param" value="&lg={GPS_LOCATION}"/><label>Icon</label></li>
+				<li><input type="checkbox" name="param" value="&lg={GPS_LOCATION}"/><label>CTA</label></li>
+			</ul>
+		</form>
+	</li>
+	</ul>
+ 
+	<div class="popup" data-popup="popup-1">
+	    <div class="popup-inner">
+	        <h2>Final Tag!</h2>
+	        <p id="tag"></p>
+	        <a class="popup-close" data-popup-close="popup-1" href="#">x</a>
+	    </div>
+	</div>
+
+	<button id="opener" type="button" class="button button1" name="RequestGenerator" onclick="generateTag()" data-popup-open="popup-1" href="#">Generate Tag</button>
+</div>
 
 </body>
 </html>
